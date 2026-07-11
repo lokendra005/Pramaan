@@ -30,12 +30,14 @@ export async function openLiveSession(apiKey, emit, systemInstruction) {
   };
   log("connecting", LIVE_MODEL);
 
+  const turn = { text: "" }; // accumulates the model's transcript for THIS turn
+
   const session = await ai.live.connect({
     model: LIVE_MODEL,
     config,
     callbacks: {
       onopen: () => { log("open"); emit({ t: "ready" }); },
-      onmessage: (m) => handleMessage(m, emit),
+      onmessage: (m) => handleMessage(m, emit, turn),
       onerror: (e) => { log("error", e?.message || e); emit({ t: "error", message: String(e?.message || e) }); },
       onclose: (e) => { log("close", e?.reason || ""); emit({ t: "closed" }); },
     },
@@ -65,7 +67,7 @@ export async function openLiveSession(apiKey, emit, systemInstruction) {
 }
 
 /** Parse a Live server message into our tiny browser protocol. Forgiving by design. */
-function handleMessage(m, emit) {
+function handleMessage(m, emit, turn) {
   try {
     const sc = m?.serverContent;
     let sawAudio = false; // emit each audio chunk ONCE (double-emit = stutter/echo)
@@ -78,33 +80,44 @@ function handleMessage(m, emit) {
         emit({ t: "audio", b64: inline.data });
         sawAudio = true;
       }
-      if (p?.text) emitTranscript(p.text, "model", emit);
+      if (p?.text) { turn.text += " " + p.text; emit({ t: "transcript", role: "model", text: p.text }); }
     }
-
-    // 2) Fallback ONLY if the turn parts didn't already carry the audio.
     if (!sawAudio && m?.data && typeof m.data === "string") emit({ t: "audio", b64: m.data });
 
-    // 3) Transcriptions (captions)
+    // 2) Transcriptions (captions) — accumulate the MODEL's into the turn buffer
     const outT = sc?.outputTranscription?.text || sc?.output_transcription?.text;
-    if (outT) emitTranscript(outT, "model", emit);
+    if (outT) { turn.text += " " + outT; emit({ t: "transcript", role: "model", text: outT }); }
     const inT = sc?.inputTranscription?.text || sc?.input_transcription?.text;
     if (inT) emit({ t: "transcript", role: "user", text: inT });
 
-    // 4) Barge-in / interruption
-    if (sc?.interrupted) emit({ t: "interrupted" });
+    // 3) Barge-in — drop the half-spoken turn
+    if (sc?.interrupted) { emit({ t: "interrupted" }); turn.text = ""; }
+
+    // 4) Turn finished → classify the WHOLE accumulated line, once. Handles fragmented
+    //    transcripts (e.g. "Verif" + "ied:") that per-chunk matching always missed.
+    if (sc?.turnComplete || sc?.generationComplete) {
+      classifyTurn(turn.text, emit);
+      turn.text = "";
+    }
   } catch (e) {
     log("parse error", e?.message);
   }
 }
 
-/** Model transcript → caption, and raise a FLAG (red) or VERIFIED (green) card. */
-function emitTranscript(text, role, emit) {
-  emit({ t: "transcript", role, text });
-  const low = text.trim().toLowerCase();
-  // Prefixes the model is instructed to use take priority; keywords are the fallback.
-  if (low.startsWith("flag") || FLAG_KEYWORDS.some((k) => low.includes(k))) {
-    emit({ t: "flag", reason: text.replace(/^flag:\s*/i, "").trim() });
-  } else if (low.startsWith("verified") || VERIFY_KEYWORDS.some((k) => low.includes(k))) {
-    emit({ t: "verified", reason: text.replace(/^verified:\s*/i, "").trim() });
-  }
+/** Decide VERIFIED (green) vs FLAG (red) from the full turn. Prefix-first so a benign
+ *  phrase can't false-flag; conservative flag keywords; broad verify fallback. */
+function classifyTurn(text, emit) {
+  const t = (text || "").trim().toLowerCase();
+  if (!t) return;
+  const clean = (s) => text.replace(/^\s*(flag|verified)\s*[:\-]?\s*/i, "").trim();
+
+  if (t.startsWith("flag")) return void emit({ t: "flag", reason: clean() });
+  if (t.startsWith("verified")) return void emit({ t: "verified", reason: clean() });
+
+  // fallbacks when the model forgot the prefix — verify first (affirmative), then only
+  // UNAMBIGUOUS flag words (dropped "does not match": it appears in verified negations).
+  if (/verif|consistent with|matches the claim|checks out|confirmed|active office/.test(t))
+    return void emit({ t: "verified", reason: text.trim() });
+  if (/discrepanc|mismatch|contradict|no sewing|not a (workshop|tailor|shop|store)/.test(t))
+    return void emit({ t: "flag", reason: text.trim() });
 }
