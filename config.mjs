@@ -30,6 +30,12 @@ export const SCENARIOS = {
     claim: "Working-capital loan. Applicant claims 'Meena Tailoring' — a garment workshop with 4 industrial sewing machines and rolls of fabric on site.",
     expectPass: false,
   },
+  eventhall: {
+    label: "Event hall",
+    sub: "Should VERIFY — point at the room full of people",
+    claim: "Event-venue loan. Applicant claims an active event hall — a full room with a crowd of attendees seated.",
+    expectPass: true,
+  },
 };
 
 export function getScenario(id) {

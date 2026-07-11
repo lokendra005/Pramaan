@@ -30,7 +30,8 @@ function showHome() { if (running) stop(); showScreen("home"); }
 function showLiveMenu() { showScreen("liveMenu"); }
 function pickLive(s) {
   scenario = s; customClaim = null;
-  $("scenarioLabel").textContent = s === "office" ? "Office check" : "Workshop check";
+  const labels = { office: "Office check", tailoring: "Workshop check", eventhall: "Event hall check" };
+  $("scenarioLabel").textContent = labels[s] || "Live check";
   showScreen("stage");
 }
 function toggleLiveAdd() { $("liveAddForm").hidden = !$("liveAddForm").hidden; }
