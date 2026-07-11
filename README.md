@@ -1,6 +1,6 @@
 # Pramaan — proof that the work actually happened
 
-**Real-time + on-device field verification for lending.** Does a loan claim match physical reality?
+**A verification layer for the physical world** — does a claim match what the camera actually sees? Real-time or on-device. **Demonstrated on field lending** (our wedge; the same engine extends to insurance, subsidy & inventory verification).
 
 **Track:** Real-Time Multimodal Interaction (Gemini Live API) · **Also competing:** Best Use of Gemma 4 (Local-First Agents on-device)
 **Live demo video:** _<paste link>_ · **Run:** `npm start` → http://localhost:8790
