@@ -8,7 +8,7 @@
 ---
 
 ## The problem
-In Indian field lending, every rural loan or insurance decision rests on a field photo nobody can trust — ghost businesses, recycled claim photos, colluding agents. AI agents can file reports; **none of them know whether the work in the physical world actually happened.**
+AI agents can act — approve, file, notify — but **none can confirm the physical world matches what was claimed.** That gap is where fraud hides: across lending, insurance, subsidies and asset finance, decisions rest on a field photo nobody can trust — ghost businesses, recycled photos, phantom collateral. We prove it on **rural field lending** — India's highest-fraud, lowest-connectivity, highest-impact wedge.
 
 ## What it does — and why it's different
 An agent that verifies a claim against what the camera **actually sees**, and acts on its own:
