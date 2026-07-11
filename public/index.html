@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#14532D" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Pramaan — real-time field verification</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- HOME: pick a mode -->
+  <section id="home" class="screen menu active">
+    <div class="menu-hero">
+      <div class="brand big"><span class="shield">✓</span> Pramaan</div>
+      <p class="tag">Does the loan claim match reality? Verify it — live, or on-device.</p>
+    </div>
+    <div class="mode-cards">
+      <button class="mode" style="--d:.05s" onclick="showLiveMenu()">
+        <div class="mode-top"><span class="mode-ic">🎙️</span><span class="s-badge">online</span></div>
+        <div class="mode-title">Live verification</div>
+        <div class="mode-sub">Real-time &amp; conversational — the agent sees, hears, translates, and flags discrepancies as they happen.</div>
+        <div class="mode-go">Choose a case <span class="arrow">→</span></div>
+      </button>
+      <a class="mode" style="--d:.12s" href="offline.html">
+        <div class="mode-top"><span class="mode-ic">✈️</span><span class="s-badge edge">on-device</span></div>
+        <div class="mode-title">Offline edge agent</div>
+        <div class="mode-sub">No signal? Gemma runs on-device — counts assets, recovers from bad frames, defers to a human.</div>
+        <div class="mode-go">Open <span class="arrow">→</span></div>
+      </a>
+    </div>
+    <p class="foot">Two modes, one product: online when there's signal, on-device when there isn't.</p>
+  </section>
+
+  <!-- LIVE MENU: pick a case -->
+  <section id="liveMenu" class="screen menu hidden">
+    <button class="back top" onclick="showHome()">‹ back</button>
+    <div class="menu-hero small">
+      <div class="brand"><span class="shield">✓</span> Live verification</div>
+      <p class="tag">Pick a case — point the camera and speak; the agent flags in real time.</p>
+    </div>
+    <div class="mode-cards">
+      <button class="mode" style="--d:.05s" onclick="pickLive('office')">
+        <div class="mode-top"><span class="mode-ic">🏢</span><span class="s-badge">office loan</span></div>
+        <div class="mode-title">Office workspace</div>
+        <div class="mode-sub">Verify an active, staffed office against the loan claim.</div>
+        <div class="mode-go">Start <span class="arrow">→</span></div>
+      </button>
+      <button class="mode" style="--d:.12s" onclick="pickLive('tailoring')">
+        <div class="mode-top"><span class="mode-ic">🧵</span><span class="s-badge">workshop loan</span></div>
+        <div class="mode-title">Garment workshop — “Meena Tailoring”</div>
+        <div class="mode-sub">Claim: 4 sewing machines. The agent checks reality against it.</div>
+        <div class="mode-go">Start <span class="arrow">→</span></div>
+      </button>
+    </div>
+    <div class="add-wrap">
+      <button class="btn ghost" onclick="toggleLiveAdd()">+ Add a custom case</button>
+      <div class="add-form" id="liveAddForm" hidden>
+        <input id="liveClaim" class="field-in" placeholder="Type the claim — e.g. Applicant claims a 20-seat restaurant with staff on site" />
+        <button class="btn primary" onclick="addLiveCase()">Verify this claim →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE STAGE -->
+  <section id="stage" class="screen hidden">
+    <video id="cam" autoplay playsinline muted></video>
+    <div class="scrim top"></div><div class="scrim bottom"></div>
+    <header>
+      <button class="back chip-back" onclick="stop()">‹</button>
+      <div class="brand"><span class="shield">✓</span> Pramaan <small id="scenarioLabel">Live</small></div>
+      <div class="onair" id="onair"><span class="dot"></span> STANDBY</div>
+    </header>
+    <div class="claimbar" id="claimbar"></div>
+    <div class="verdict flag" id="flag"><div class="v-h">⚠ DISCREPANCY FLAGGED</div><div class="v-body" id="flagBody"></div></div>
+    <div class="verdict ok" id="verified"><div class="v-h">✓ VERIFIED</div><div class="v-body" id="verifiedBody"></div></div>
+    <div class="captions" id="captions"></div>
+    <div class="controls">
+      <button id="startBtn" class="btn primary">Start verification</button>
+      <button id="stopBtn" class="btn ghost" hidden>End</button>
+      <div class="status" id="status">Tap start · allow mic + camera</div>
+    </div>
+  </section>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

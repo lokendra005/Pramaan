@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Pramaan — offline on-device agent</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="offline">
+    <header class="off-head">
+      <a class="back" href="index.html">‹ back</a>
+      <div class="brand"><span class="shield">✓</span> Pramaan <small>Edge agent · on-device</small></div>
+      <div class="airplane">✈ OFFLINE OK</div>
+    </header>
+
+    <div class="off-status" id="visionStatus">On-device vision: loading…</div>
+
+    <p class="off-lead">Pick a verification (or add one), point the camera, and the edge agent counts
+      what's actually there — on-device — and checks it against the claim. Works with Wi-Fi off.</p>
+
+    <div class="off-grid">
+      <!-- LEFT: set up the verification -->
+      <div class="col">
+        <div class="section-label">Verifications</div>
+        <div class="off-cards" id="taskList"></div>
+        <button class="btn ghost" id="addToggle">+ Add a verification</button>
+        <div class="add-form" id="addForm" hidden>
+          <input id="taskName" class="field-in" placeholder="Business / claim — e.g. Sri Electronics, loan for 3 TVs" />
+          <div class="req-builder">
+            <select id="reqObj" class="field-in"></select>
+            <input id="reqCount" class="field-in count" type="number" min="1" value="1" />
+            <button class="btn ghost small" id="reqAdd">Add item</button>
+          </div>
+          <div id="reqList" class="req-list"></div>
+          <button class="btn primary" id="taskSave">Save verification</button>
+        </div>
+        <div class="claimbar dark" id="offClaim">Select or add a verification.</div>
+      </div>
+
+      <!-- RIGHT: run it -->
+      <div class="col">
+        <div class="off-cam"><video id="ocam" autoplay playsinline muted></video></div>
+        <button class="btn primary" id="capBtn" disabled>Select a verification first</button>
+        <div class="trace-panel" id="trace"></div>
+        <div class="decision" id="decision"></div>
+        <div class="followup" id="followup" hidden>
+          <div class="fu-label">Ask the on-device agent about this case</div>
+          <div class="fu-row">
+            <input id="askInput" class="field-in" placeholder="e.g. why did you defer? what's missing?" />
+            <button class="btn primary small" id="askBtn">Ask</button>
+          </div>
+          <div class="fu-answer" id="answer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="offline.js"></script>
+</body>
+</html>

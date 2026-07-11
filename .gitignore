@@ -1,0 +1,9 @@
+# NEVER commit the key — leaked keys get auto-killed by the organizers.
+.env
+node_modules/
+*.log
+.DS_Store
+# Ignore the huge Gemma model, keep the small local detection model + README + vendored libs
+public/models/*
+!public/models/README.md
+!public/models/efficientdet_lite0.tflite
